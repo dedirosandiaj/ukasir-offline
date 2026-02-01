@@ -60,7 +60,7 @@ app.post('/validate', async (c) => {
 })
 
 export const config = {
-    runtime: 'edge'
+    runtime: 'nodejs'
 }
 
 export default handle(app)
