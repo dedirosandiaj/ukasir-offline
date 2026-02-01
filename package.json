@@ -1,0 +1,17 @@
+{
+    "name": "ugasir-token-api",
+    "version": "1.0.0",
+    "scripts": {
+        "dev": "tsx watch dev.ts"
+    },
+    "dependencies": {
+        "@hono/node-server": "^1.19.9",
+        "dotenv": "^16.0.0",
+        "hono": "^4.0.0",
+        "postgres": "^3.4.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "tsx": "^4.0.0"
+    }
+}
