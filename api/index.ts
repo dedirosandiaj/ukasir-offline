@@ -6,9 +6,9 @@ import 'dotenv/config'
 const app = new Hono().basePath('/api')
 
 const sql = postgres(process.env.DATABASE_URL!, {
-    ssl: false,
+    ssl: { rejectUnauthorized: false }, // Enable SSL but allow self-signed certs (common for VPS)
     max: 1,
-    connect_timeout: 10 // Fail fast (10s) if firewall/network issue
+    connect_timeout: 2 // Fail extremely fast (2s)
 })
 
 app.get('/', (c) => {
@@ -23,7 +23,17 @@ app.get('/cek', async (c) => {
 
         // 2. Test Connection
         const startTime = Date.now()
-        await sql`SELECT 1`
+
+        // Timeout wrapper since driver timeout might verify slowly
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Strict App Timeout (3s) - Firewall likely blocking')), 3000)
+        )
+
+        await Promise.race([
+            sql`SELECT 1`,
+            timeoutPromise
+        ])
+
         const duration = Date.now() - startTime
 
         return c.json({

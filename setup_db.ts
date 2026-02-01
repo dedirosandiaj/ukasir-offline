@@ -2,7 +2,7 @@ import postgres from 'postgres';
 import 'dotenv/config';
 
 const sql = postgres(process.env.DATABASE_URL!, {
-    ssl: false // Disable SSL for now as per user likely setup
+    ssl: true  // Disable SSL for now as per user likely setup
 });
 
 async function main() {
