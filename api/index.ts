@@ -15,6 +15,40 @@ app.get('/', (c) => {
     return c.json({ message: 'Ukasir Offline API is running!' })
 })
 
+app.get('/cek', async (c) => {
+    try {
+        // 1. Check Env Var
+        const hasDbUrl = !!process.env.DATABASE_URL
+        const dbUrlStart = process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 20) + '...' : 'Not Set'
+
+        // 2. Test Connection
+        const startTime = Date.now()
+        await sql`SELECT 1`
+        const duration = Date.now() - startTime
+
+        return c.json({
+            status: 'ok',
+            message: 'Database connection successful',
+            env: {
+                DATABASE_URL_SET: hasDbUrl,
+                DATABASE_URL_PREVIEW: dbUrlStart
+            },
+            connection_time_ms: duration,
+            timestamp: new Date().toISOString()
+        })
+    } catch (error) {
+        console.error('Diagnostic Error:', error)
+        return c.json({
+            status: 'error',
+            message: 'Database connection failed',
+            error_details: String(error),
+            env: {
+                DATABASE_URL_SET: !!process.env.DATABASE_URL
+            }
+        }, 500)
+    }
+})
+
 app.post('/validate', async (c) => {
     try {
         const body = await c.req.json()
@@ -56,7 +90,11 @@ app.post('/validate', async (c) => {
 
     } catch (error) {
         console.error('Error validating token:', error)
-        return c.json({ success: false, message: 'Internal Server Error' }, 500)
+        return c.json({
+            success: false,
+            message: 'Internal Server Error',
+            debug_error: String(error) // Temporary for debugging
+        }, 500)
     }
 })
 
