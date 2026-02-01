@@ -6,8 +6,9 @@ import 'dotenv/config'
 const app = new Hono().basePath('/api')
 
 const sql = postgres(process.env.DATABASE_URL!, {
-    ssl: false, // User provided IP, likely no SSL or using self-signed if strictly needed, but let's try false first or 'require' if it fails.
-    max: 1 // Use a single connection for serverless if not continuously running, though 'postgres' handles this well.
+    ssl: false,
+    max: 1,
+    connect_timeout: 10 // Fail fast (10s) if firewall/network issue
 })
 
 app.get('/', (c) => {
